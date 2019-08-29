@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+*.suo
+/EnergyGeneration.Console/bin/Debug
+/EnergyGeneration.Console/obj/Debug
+/EnergyGeneration.Domain/bin/Debug
+/EnergyGeneration.Domain/obj/Debug
+/EnergyGeneration.Infrastructure/bin/Debug
+/EnergyGeneration.Infrastructure/obj/Debug
+/EnergyGeneration.Tests/bin/Debug
+/EnergyGeneration.Tests/obj/Debug
