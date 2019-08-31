@@ -17,10 +17,12 @@ namespace EnergyGeneration.Console
         /// <param name="args">The arguments.</param>
         static void Main(string[] args)
         {
+            System.Console.ForegroundColor = ConsoleColor.White;
             System.Console.WriteLine($"Welcome to Energy Generation Report Application.{Environment.NewLine}Application started @ {DateTime.Now}");
 
             Bootstraper.Instance.Initialize();
 
+            System.Console.ForegroundColor = ConsoleColor.White;
             System.Console.ReadLine();
         }
     }

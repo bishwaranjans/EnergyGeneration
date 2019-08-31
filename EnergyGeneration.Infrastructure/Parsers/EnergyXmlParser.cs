@@ -4,8 +4,6 @@ using EnergyGeneration.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using static EnergyGeneration.Domain.SeedWork.Constants;
@@ -38,12 +36,23 @@ namespace EnergyGeneration.Infrastructure.Parsers
         /// </summary>
         public override void Read()
         {
-            var generationReport = new GenerationReport()
+            try
             {
-                Wind = GetWindGenerators(),
-                Coal = GetCoalGenerator(),
-                Gas = GetGasGenerators()
-            };
+                var generationReport = new GenerationReport()
+                {
+                    Wind = GetWindGenerators(),
+                    Coal = GetCoalGenerator(),
+                    Gas = GetGasGenerators()
+                };
+
+                System.Console.WriteLine($"Generation report parsed!{Environment.NewLine}Wind Generator count: {generationReport.Wind.Count}{Environment.NewLine}Coal Generator count: {generationReport.Coal.Count}{Environment.NewLine}Gas Generator count: {generationReport.Gas.Count}{Environment.NewLine}");
+            }
+            catch (Exception ex)
+            {
+                System.Console.ForegroundColor = ConsoleColor.Red;
+                System.Console.WriteLine($"Error occurre! Message : {ex.Message}. StackTrace : {ex.StackTrace}");
+                System.Console.ForegroundColor = ConsoleColor.Green;
+            }
         }
 
         /// <summary>
@@ -106,6 +115,7 @@ namespace EnergyGeneration.Infrastructure.Parsers
             var windGenerators = (from windGeneratorElement in SimpleStreamAxis(FileName, "WindGenerator")
                                   select new WindGenerator
                                   {
+                                      IsFossilFuel = false,
                                       Name = (windGeneratorElement.ElementAnyNS("Name") != null) ? windGeneratorElement.ElementAnyNS("Name").Value : string.Empty,
                                       Location = (windGeneratorElement.ElementAnyNS("Location") != null) ? windGeneratorElement.ElementAnyNS("Location").Value : string.Empty,
                                       Generation = windGeneratorElement.ElementAnyNS("Generation") != null ? (from dayGeneration in windGeneratorElement.ElementAnyNS("Generation").Elements()
@@ -129,6 +139,7 @@ namespace EnergyGeneration.Infrastructure.Parsers
             var gasGenerators = (from gasGeneratorElement in SimpleStreamAxis(FileName, "GasGenerator")
                                  select new GasGenerator
                                  {
+                                     IsFossilFuel = true,
                                      Name = (gasGeneratorElement.ElementAnyNS("Name") != null) ? gasGeneratorElement.ElementAnyNS("Name").Value : string.Empty,
                                      EmissionsRating = (gasGeneratorElement.ElementAnyNS("EmissionsRating") != null) ? Double.Parse(gasGeneratorElement.ElementAnyNS("EmissionsRating").Value) : 0.0,
                                      Generation = gasGeneratorElement.ElementAnyNS("Generation") != null ? (from dayGeneration in gasGeneratorElement.ElementAnyNS("Generation").Elements()
@@ -152,6 +163,7 @@ namespace EnergyGeneration.Infrastructure.Parsers
             var gasGenerators = (from coalGeneratorElement in SimpleStreamAxis(FileName, "CoalGenerator")
                                  select new CoalGenerator
                                  {
+                                     IsFossilFuel = true,
                                      Name = (coalGeneratorElement.ElementAnyNS("Name") != null) ? coalGeneratorElement.ElementAnyNS("Name").Value : string.Empty,
                                      EmissionsRating = (coalGeneratorElement.ElementAnyNS("EmissionsRating") != null) ? Double.Parse(coalGeneratorElement.ElementAnyNS("EmissionsRating").Value) : 0.0,
                                      TotalHeatInput = (coalGeneratorElement.ElementAnyNS("TotalHeatInput") != null) ? Double.Parse(coalGeneratorElement.ElementAnyNS("TotalHeatInput").Value) : 0.0,

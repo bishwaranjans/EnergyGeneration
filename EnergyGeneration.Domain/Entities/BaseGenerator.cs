@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace EnergyGeneration.Domain.Entities
 {
@@ -26,5 +22,13 @@ namespace EnergyGeneration.Domain.Entities
         /// The generation.
         /// </value>
         public List<Day> Generation { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is fossil fuel.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is fossil fuel; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsFossilFuel { get; set; }
     }
 }

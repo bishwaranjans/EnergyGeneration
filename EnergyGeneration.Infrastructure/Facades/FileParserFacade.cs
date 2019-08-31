@@ -1,11 +1,7 @@
 ﻿using EnergyGeneration.Domain.Base;
 using EnergyGeneration.Infrastructure.Factories;
-using System;
-using System.Collections.Generic;
+using EnergyGeneration.Infrastructure.Validation;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static EnergyGeneration.Domain.SeedWork.Constants;
 
 namespace EnergyGeneration.Infrastructure.Facades
@@ -24,7 +20,6 @@ namespace EnergyGeneration.Infrastructure.Facades
         public FileParserFacade()
         {
             Factory = new ParserFactory();
-
         }
 
         /// <summary>
@@ -33,13 +28,11 @@ namespace EnergyGeneration.Infrastructure.Facades
         /// <param name="FileName">Name of the file.</param>
         public void ParseFile(string FileName)
         {
-            //ValidateFile.Validate(FileName);
+            ValidateFile.Validate(FileName);
             ParserType type = GetExtention(FileName);
             parser = Factory.GetObject(type.ToString());
             parser.FileName = FileName;
             parser.Read();
-
-
         }
 
         /// <summary>

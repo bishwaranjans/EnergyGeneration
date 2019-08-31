@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EnergyGeneration.Domain.Base
+﻿namespace EnergyGeneration.Domain.Base
 {
     /// <summary>
     /// GenericFactory
     /// </summary>
-    /// <typeparam name="TEnity">The type of the enity.</typeparam>
-    public abstract class GenericFactory<TEnity>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    public abstract class GenericFactory<TEntity>
     {
         /// <summary>
         /// Gets the object.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns></returns>
-        public abstract TEnity GetObject(string type);
+        public abstract TEntity GetObject(string type);
     }
 }

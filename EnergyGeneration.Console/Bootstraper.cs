@@ -18,6 +18,7 @@ namespace EnergyGeneration.Console
     {
         private static readonly Lazy<Bootstraper> lazy = new Lazy<Bootstraper>(() => new Bootstraper());
         private static FileSystemWatcher fileWatcher;
+        private static FileParserFacade facade;
 
         /// <summary>
         /// Gets the singleton instance.
@@ -54,11 +55,12 @@ namespace EnergyGeneration.Console
 
             // Add event handlers.
             fileWatcher.Changed += OnChanged;
-            fileWatcher.Created += OnChanged;
 
             // Begin watching.
             fileWatcher.EnableRaisingEvents = true;
 
+            // Instantiate the facade
+            facade = new FileParserFacade();
         }
 
         /// <summary>
@@ -75,25 +77,17 @@ namespace EnergyGeneration.Console
 
                 /* do my stuff once asynchronously */
                 // Specify what is done when a file is changed, created, or deleted.
-                System.Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
+                System.Console.ForegroundColor = ConsoleColor.White;
+                System.Console.WriteLine($"{Environment.NewLine}File: {e.FullPath} {e.ChangeType} @ {DateTime.Now}");
 
-                System.Console.WriteLine($"File: {Constants.FileNameToProcess} creation is in progress. Listener has been disabled while processing and hence any new addition/modification of the file will not process.");
+                System.Console.ForegroundColor = ConsoleColor.Yellow;
+                System.Console.WriteLine($"File: {Constants.FileNameToProcess} changes are in progress.{Environment.NewLine}Waiting to finish the cahnges and meanwhile listener has been disabled. Any new addition/modification of the file will not process.");
 
                 // Wait for the whole file to get copied to watch folder
                 WaitForFile(e.FullPath);
 
-                System.Console.WriteLine($"File: {Constants.FileNameToProcess} is available now and processing started.");
-
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-
                 // Begin reading
-                FileParserFacade facade = new FileParserFacade();
-                facade.ParseFile(e.FullPath);
-
-                // Begin Report generation
-
-                sw.Stop();
+                BeginReading(e.FullPath);
             }
 
             finally
@@ -122,6 +116,28 @@ namespace EnergyGeneration.Console
                     Thread.Sleep(1000);
                 }
             }
+        }
+
+        /// <summary>
+        /// Begins the reading.
+        /// </summary>
+        /// <param name="fullFileName">Full name of the file.</param>
+        private static void BeginReading(string fullFileName)
+        {
+            System.Console.ForegroundColor = ConsoleColor.Green;
+            System.Console.WriteLine($"File: {Constants.FileNameToProcess} is available now and processing started @ {DateTime.Now}.");
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            // Begin reading
+            facade = new FileParserFacade();
+            facade.ParseFile(fullFileName);
+
+            // Begin Report generation
+
+            sw.Stop();
+            System.Console.WriteLine($"File: {Constants.FileNameToProcess} finished processing @ {DateTime.Now}. Total elapsed time in seconds : {sw.Elapsed.TotalSeconds}");
         }
     }
 }
