@@ -22,7 +22,7 @@ DDD approch has been used for designing the architecture of the solution by clea
  
  ## Design Patterns
  
-Facade and Factory design patterns has been incorporated to design the application. The primary focus was to accommodate multiple parser into the application. Currently it is supporting XML parsing and later on it provides the extensibility to support any other parsing like CSV or EXcel etc. Basic SOLID design patterns has been followed whereever possible. 
+Facade and Factory design patterns has been incorporated to design the application. The primary focus was to accommodate multiple parser into the application. Currently it is supporting XML parsing and later on it provides the extensibility to support any other parsing like CSV or EXcel etc. Basic SOLID design patterns has been followed wherever possible. 
 
 ## Logging
 log4net has been used for logging various level of informtion for the application. File level and console level logging has been implemented and log4net configuration details can be found in **App.config** file.
