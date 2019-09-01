@@ -1,7 +1,7 @@
 # Energy Generation Report Documentation
 The EnergyGeneration application has been designed inline with SOA and Domain Driven Design(DDD) to provide end user a console application to process energy generation report and providing simulatd output file in real-time and dynamic environment.
 
-# Implementation Requirement
+## Implementation Requirement
 An XML file containing generator data (see accompanying file GenerationReport.xml) is produced and provided as input into an input folder on a regular basis. 
 The solution is required to automatically pick up the received XML file as soon as it is placed in the input folder (location of input folder is set in the Application app.config file), perform parsing and data processing as appropriate to achieve the following:
 1.	It is required to calculate and output the **Total Generation Value** for each generator.
