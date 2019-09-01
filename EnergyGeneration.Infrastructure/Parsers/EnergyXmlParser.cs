@@ -63,9 +63,9 @@ namespace EnergyGeneration.Infrastructure.Parsers
                 else
                 {
                     ParseGenerateReportData();
-                    CalculateDailyGenerationValue();
-                    CalculateDailyEmissionValue();
-                    CalculateActualHeatRateValue();
+                    CalculateCummulativeDailyGeneration();
+                    CalculateCummulativeDailyMaxEmission();
+                    CalculateCummulativeActualHeatRate();
                     GenerationOutput();
                 }
             }
@@ -105,286 +105,6 @@ namespace EnergyGeneration.Infrastructure.Parsers
             // Save
             var fileFullName = Path.Combine(OutputFileFolder, OutputFileName);
             doc.Save(fileFullName);
-        }
-
-        /// <summary>
-        /// Calculates the daily generation value.
-        /// </summary>
-        public void CalculateDailyGenerationValue()
-        {
-            // Dailywise wind generation
-            foreach (var windGeneration in GenerationReportData.Wind)
-            {
-                foreach (var dayWiseWindGeneration in windGeneration.Generation)
-                {
-                    var windGenerationDay = dayWiseWindGeneration.Date;
-                    double valueFactorMappingReferenceData = 1;
-
-                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(windGeneration.GeneratorType))
-                    {
-                        var valueFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[windGeneration.GeneratorType];
-                        var valueFactorMapping = valueFactorMappingTuple.Item1.Value;
-
-                        switch (valueFactorMapping)
-                        {
-                            case ValueFactorType.Low:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Low;
-                                break;
-                            case ValueFactorType.Medium:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Medium;
-                                break;
-                            case ValueFactorType.High:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.High;
-                                break;
-                        };
-
-                    }
-                    var windGenerationByDay = dayWiseWindGeneration.Energy * dayWiseWindGeneration.Price * valueFactorMappingReferenceData;
-
-                    var windDailyGeneration = new DailyGeneration
-                    {
-                        Date = windGenerationDay,
-                        GenerationTypeName = windGeneration.Name,
-                        GeneratorType = windGeneration.GeneratorType,
-                        GenerationValue = windGenerationByDay
-                    };
-
-                    DailyGenerations.Add(windDailyGeneration);
-                }
-            }
-
-            // Gas generation
-            foreach (var gasGeneration in GenerationReportData.Gas)
-            {
-                foreach (var dayWiseGasGeneration in gasGeneration.Generation)
-                {
-                    var gasGenerationDay = dayWiseGasGeneration.Date;
-                    double valueFactorMappingReferenceData = 1;
-
-                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(gasGeneration.GeneratorType))
-                    {
-                        var valueFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[gasGeneration.GeneratorType];
-                        var valueFactorMapping = valueFactorMappingTuple.Item1.Value;
-
-                        switch (valueFactorMapping)
-                        {
-                            case ValueFactorType.Low:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Low;
-                                break;
-                            case ValueFactorType.Medium:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Medium;
-                                break;
-                            case ValueFactorType.High:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.High;
-                                break;
-                        };
-
-                    }
-                    var gasGenerationByDay = dayWiseGasGeneration.Energy * dayWiseGasGeneration.Price * valueFactorMappingReferenceData;
-
-                    var gasDailyGeneration = new DailyGeneration
-                    {
-                        Date = gasGenerationDay,
-                        GenerationTypeName = gasGeneration.Name,
-                        GeneratorType = GeneratorType.Gas,
-                        GenerationValue = gasGenerationByDay
-                    };
-
-                    DailyGenerations.Add(gasDailyGeneration);
-                }
-            }
-
-            // Coal generation
-            foreach (var coalGeneration in GenerationReportData.Coal)
-            {
-                foreach (var dayWiseCoalGeneration in coalGeneration.Generation)
-                {
-                    var coalGenerationDay = dayWiseCoalGeneration.Date;
-                    double valueFactorMappingReferenceData = 1;
-
-                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(coalGeneration.GeneratorType))
-                    {
-                        var valueFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[coalGeneration.GeneratorType];
-                        var valueFactorMapping = valueFactorMappingTuple.Item1.Value;
-
-                        switch (valueFactorMapping)
-                        {
-                            case ValueFactorType.Low:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Low;
-                                break;
-                            case ValueFactorType.Medium:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Medium;
-                                break;
-                            case ValueFactorType.High:
-                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.High;
-                                break;
-                        };
-
-                    }
-                    var coalGenerationByDay = dayWiseCoalGeneration.Energy * dayWiseCoalGeneration.Price * valueFactorMappingReferenceData;
-
-                    var coalDailyGeneration = new DailyGeneration
-                    {
-                        Date = coalGenerationDay,
-                        GenerationTypeName = coalGeneration.Name,
-                        GeneratorType = GeneratorType.Coal,
-                        GenerationValue = coalGenerationByDay
-                    };
-
-                    DailyGenerations.Add(coalDailyGeneration);
-                }
-            }
-
-            // Total offshore wind type generation
-            TotalOnshoreWindGeneration = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.OnshoreWind)
-                                        .GroupBy(s => s.GenerationTypeName)
-                                        .ToDictionary(s => s.Key, s => s.Select(p => p.GenerationValue).Sum());
-
-            // Total onshore wind type generation
-            TotalOffshoreWindGeneration = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.OffshoreWind)
-                                        .GroupBy(s => s.GenerationTypeName)
-                                        .ToDictionary(s => s.Key, s => s.Select(p => p.GenerationValue).Sum());
-
-            // Total Gas Generation By Name
-            TotalGasGenerationByName = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.Gas)
-                                     .GroupBy(s => s.GenerationTypeName)
-                                     .ToDictionary(s => s.Key, s => s.Select(p => p.GenerationValue).Sum());
-
-            // Total Coal Generation By Name
-            TotalCoalGenerationByName = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.Coal)
-                                      .GroupBy(s => s.GenerationTypeName)
-                                      .ToDictionary(s => s.Key, s => s.Select(p => p.GenerationValue).Sum());
-
-            TotalDailyGenerationByName = TotalCoalGenerationByName.Concat(TotalGasGenerationByName).Concat(TotalOffshoreWindGeneration).Concat(TotalOnshoreWindGeneration).GroupBy(d => d.Key)
-             .ToDictionary(d => d.Key, d => d.First().Value);
-        }
-
-        /// <summary>
-        /// Calculates the daily emission value.
-        /// </summary>
-        public void CalculateDailyEmissionValue()
-        {
-            // Dailywise wind emission
-            // Wind is not emitting anything
-            // No Emissions factor and value is provided in contract xml format 
-
-            // Gas Emissions
-            foreach (var gasGeneration in GenerationReportData.Gas)
-            {
-                foreach (var dayWiseGasGeneration in gasGeneration.Generation)
-                {
-                    var gasGenerationDay = dayWiseGasGeneration.Date;
-                    double emissionFactorMappingReferenceData = 1;
-
-                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(gasGeneration.GeneratorType))
-                    {
-                        var emissionFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[gasGeneration.GeneratorType];
-                        var emissionFactorMapping = emissionFactorMappingTuple.Item2.Value;
-
-                        switch (emissionFactorMapping)
-                        {
-                            case EmissionFactorType.NA:
-                                emissionFactorMappingReferenceData = 0;
-                                break;
-                            case EmissionFactorType.Low:
-                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.Low;
-                                break;
-                            case EmissionFactorType.Medium:
-                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.Medium;
-                                break;
-                            case EmissionFactorType.High:
-                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.High;
-                                break;
-                        };
-
-                    }
-                    var gasEmissionByDay = dayWiseGasGeneration.Energy * gasGeneration.EmissionsRating * emissionFactorMappingReferenceData;
-
-                    var gasDailyEmission = new DailyEmission
-                    {
-                        Date = gasGenerationDay,
-                        GenerationTypeName = gasGeneration.Name,
-                        GeneratorType = GeneratorType.Gas,
-                        DailyEmissionValue = gasEmissionByDay
-                    };
-
-                    DailyEmissions.Add(gasDailyEmission);
-                }
-            }
-
-            // Coal Emissions
-            foreach (var coalGeneration in GenerationReportData.Coal)
-            {
-                foreach (var dayWiseCoalGeneration in coalGeneration.Generation)
-                {
-                    var coalGenerationDay = dayWiseCoalGeneration.Date;
-                    double emissionFactorMappingReferenceData = 1;
-
-                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(coalGeneration.GeneratorType))
-                    {
-                        var emissionFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[coalGeneration.GeneratorType];
-                        var emissionFactorMapping = emissionFactorMappingTuple.Item2.Value;
-
-                        switch (emissionFactorMapping)
-                        {
-                            case EmissionFactorType.NA:
-                                emissionFactorMappingReferenceData = 0;
-                                break;
-                            case EmissionFactorType.Low:
-                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.Low;
-                                break;
-                            case EmissionFactorType.Medium:
-                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.Medium;
-                                break;
-                            case EmissionFactorType.High:
-                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.High;
-                                break;
-                        };
-
-                    }
-                    var coalEmissionByDay = dayWiseCoalGeneration.Energy * coalGeneration.EmissionsRating * emissionFactorMappingReferenceData;
-
-                    var coalDailyEmission = new DailyEmission
-                    {
-                        Date = coalGenerationDay,
-                        GenerationTypeName = coalGeneration.Name,
-                        GeneratorType = GeneratorType.Coal,
-                        DailyEmissionValue = coalEmissionByDay
-                    };
-
-                    DailyEmissions.Add(coalDailyEmission);
-                }
-            }
-
-            MaxEmissionGenerators = (from dailyEmission in DailyEmissions
-                                     group dailyEmission by dailyEmission.Date into dateWiseGroup
-                                     select new DailyEmission
-                                     {
-                                         Date = dateWiseGroup.Key,
-                                         DailyEmissionValue = dateWiseGroup.Max(s => s.DailyEmissionValue),
-                                         GenerationTypeName = dateWiseGroup.Where(s => s.DailyEmissionValue == dateWiseGroup.Max(p => p.DailyEmissionValue)).First().GenerationTypeName,
-                                         GeneratorType = dateWiseGroup.Where(s => s.DailyEmissionValue == dateWiseGroup.Max(p => p.DailyEmissionValue)).First().GeneratorType
-                                     }).OrderByDescending(s=>s.DailyEmissionValue).ToList();
-        }
-
-        /// <summary>
-        /// Calculates the actual heat rate value.
-        /// </summary>
-        public void CalculateActualHeatRateValue()
-        {
-            // Coal Emissions
-            foreach (var coalGeneration in GenerationReportData.Coal)
-            {
-                var coalHeatRate = coalGeneration.TotalHeatInput / coalGeneration.ActualNetGeneration;
-
-                var coalDailyEmission = new ActualHeatRate
-                {
-                    Name = coalGeneration.Name,
-                    HeatRate = coalHeatRate
-                };
-
-                ActualHeatRates.Add(coalDailyEmission);
-            }
         }
 
         /// <summary>
@@ -565,6 +285,221 @@ namespace EnergyGeneration.Infrastructure.Parsers
                                  }).ToList();
 
             return gasGenerators;
+        }
+
+        /// <summary>
+        /// Calculates the wind daily generation.
+        /// </summary>
+        private void CalculateWindDailyGeneration()
+        {
+            // Dailywise wind generation
+            foreach (var windGeneration in GenerationReportData.Wind)
+            {
+                foreach (var dayWiseWindGeneration in windGeneration.Generation)
+                {
+                    var windGenerationDay = dayWiseWindGeneration.Date;
+                    double valueFactorMappingReferenceData = FactorMappingHelper.GetValueFactorMappingReference(ReferenceData.ValueFactor, windGeneration.GeneratorType);
+
+                    var windGenerationByDay = dayWiseWindGeneration.Energy * dayWiseWindGeneration.Price * valueFactorMappingReferenceData;
+
+                    var windDailyGeneration = new DailyGeneration
+                    {
+                        Date = windGenerationDay,
+                        GenerationTypeName = windGeneration.Name,
+                        GeneratorType = windGeneration.GeneratorType,
+                        GenerationValue = windGenerationByDay
+                    };
+
+                    DailyGenerations.Add(windDailyGeneration);
+                }
+            }
+
+            // Total offshore wind type generation
+            TotalOnshoreWindGeneration = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.OnshoreWind)
+                                        .GroupBy(s => s.GenerationTypeName)
+                                        .ToDictionary(s => s.Key, s => s.Select(p => p.GenerationValue).Sum());
+
+            // Total onshore wind type generation
+            TotalOffshoreWindGeneration = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.OffshoreWind)
+                                        .GroupBy(s => s.GenerationTypeName)
+                                        .ToDictionary(s => s.Key, s => s.Select(p => p.GenerationValue).Sum());
+        }
+
+        /// <summary>
+        /// Calculates the gas daily generation.
+        /// </summary>
+        private void CalculateGasDailyGeneration()
+        {
+            // Gas generation
+            foreach (var gasGeneration in GenerationReportData.Gas)
+            {
+                foreach (var dayWiseGasGeneration in gasGeneration.Generation)
+                {
+                    var gasGenerationDay = dayWiseGasGeneration.Date;
+                    double valueFactorMappingReferenceData = FactorMappingHelper.GetValueFactorMappingReference(ReferenceData.ValueFactor, gasGeneration.GeneratorType);
+
+                    var gasGenerationByDay = dayWiseGasGeneration.Energy * dayWiseGasGeneration.Price * valueFactorMappingReferenceData;
+
+                    var gasDailyGeneration = new DailyGeneration
+                    {
+                        Date = gasGenerationDay,
+                        GenerationTypeName = gasGeneration.Name,
+                        GeneratorType = GeneratorType.Gas,
+                        GenerationValue = gasGenerationByDay
+                    };
+
+                    DailyGenerations.Add(gasDailyGeneration);
+                }
+            }
+
+            // Total Gas Generation By Name
+            TotalGasGenerationByName = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.Gas)
+                                     .GroupBy(s => s.GenerationTypeName)
+                                     .ToDictionary(s => s.Key, s => s.Select(p => p.GenerationValue).Sum());
+        }
+
+        /// <summary>
+        /// Calculates the coal daily generation.
+        /// </summary>
+        private void CalculateCoalDailyGeneration()
+        {
+            // Coal generation
+            foreach (var coalGeneration in GenerationReportData.Coal)
+            {
+                foreach (var dayWiseCoalGeneration in coalGeneration.Generation)
+                {
+                    var coalGenerationDay = dayWiseCoalGeneration.Date;
+                    double valueFactorMappingReferenceData = FactorMappingHelper.GetValueFactorMappingReference(ReferenceData.ValueFactor, coalGeneration.GeneratorType);
+
+                    var coalGenerationByDay = dayWiseCoalGeneration.Energy * dayWiseCoalGeneration.Price * valueFactorMappingReferenceData;
+
+                    var coalDailyGeneration = new DailyGeneration
+                    {
+                        Date = coalGenerationDay,
+                        GenerationTypeName = coalGeneration.Name,
+                        GeneratorType = GeneratorType.Coal,
+                        GenerationValue = coalGenerationByDay
+                    };
+
+                    DailyGenerations.Add(coalDailyGeneration);
+                }
+            }
+
+            // Total Coal Generation By Name
+            TotalCoalGenerationByName = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.Coal)
+                                      .GroupBy(s => s.GenerationTypeName)
+                                      .ToDictionary(s => s.Key, s => s.Select(p => p.GenerationValue).Sum());
+        }
+
+        /// <summary>
+        /// Calculates the daily generation value.
+        /// </summary>
+        private void CalculateCummulativeDailyGeneration()
+        {
+            CalculateWindDailyGeneration();
+            CalculateGasDailyGeneration();
+            CalculateCoalDailyGeneration();
+
+            TotalDailyGenerationByName = TotalCoalGenerationByName.Concat(TotalGasGenerationByName).Concat(TotalOffshoreWindGeneration).Concat(TotalOnshoreWindGeneration).GroupBy(d => d.Key)
+             .ToDictionary(d => d.Key, d => d.First().Value);
+        }
+
+        /// <summary>
+        /// Calculates the gas daily emission.
+        /// </summary>
+        private void CalculateGasDailyEmission()
+        {
+            // Gas Emissions
+            foreach (var gasGeneration in GenerationReportData.Gas)
+            {
+                foreach (var dayWiseGasGeneration in gasGeneration.Generation)
+                {
+                    var gasGenerationDay = dayWiseGasGeneration.Date;
+                    double emissionFactorMappingReferenceData = FactorMappingHelper.GetEmissionFactorMappingReference(ReferenceData.EmissionFactor, gasGeneration.GeneratorType);
+
+                    var gasEmissionByDay = dayWiseGasGeneration.Energy * gasGeneration.EmissionsRating * emissionFactorMappingReferenceData;
+
+                    var gasDailyEmission = new DailyEmission
+                    {
+                        Date = gasGenerationDay,
+                        GenerationTypeName = gasGeneration.Name,
+                        GeneratorType = GeneratorType.Gas,
+                        DailyEmissionValue = gasEmissionByDay
+                    };
+
+                    DailyEmissions.Add(gasDailyEmission);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates the coal daily emission.
+        /// </summary>
+        private void CalculateCoalDailyEmission()
+        {
+            // Coal Emissions
+            foreach (var coalGeneration in GenerationReportData.Coal)
+            {
+                foreach (var dayWiseCoalGeneration in coalGeneration.Generation)
+                {
+                    var coalGenerationDay = dayWiseCoalGeneration.Date;
+                    double emissionFactorMappingReferenceData = FactorMappingHelper.GetEmissionFactorMappingReference(ReferenceData.EmissionFactor, coalGeneration.GeneratorType);
+
+                    var coalEmissionByDay = dayWiseCoalGeneration.Energy * coalGeneration.EmissionsRating * emissionFactorMappingReferenceData;
+
+                    var coalDailyEmission = new DailyEmission
+                    {
+                        Date = coalGenerationDay,
+                        GenerationTypeName = coalGeneration.Name,
+                        GeneratorType = GeneratorType.Coal,
+                        DailyEmissionValue = coalEmissionByDay
+                    };
+
+                    DailyEmissions.Add(coalDailyEmission);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates the daily emission value.
+        /// </summary>
+        private void CalculateCummulativeDailyMaxEmission()
+        {
+            // Dailywise wind emission
+            // Wind is not emitting anything
+            // No Emissions factor and value is provided in contract xml format 
+            CalculateGasDailyEmission();
+            CalculateCoalDailyEmission();
+
+            MaxEmissionGenerators = (from dailyEmission in DailyEmissions
+                                     group dailyEmission by dailyEmission.Date into dateWiseGroup
+                                     select new DailyEmission
+                                     {
+                                         Date = dateWiseGroup.Key,
+                                         DailyEmissionValue = dateWiseGroup.Max(s => s.DailyEmissionValue),
+                                         GenerationTypeName = dateWiseGroup.Where(s => s.DailyEmissionValue == dateWiseGroup.Max(p => p.DailyEmissionValue)).First().GenerationTypeName,
+                                         GeneratorType = dateWiseGroup.Where(s => s.DailyEmissionValue == dateWiseGroup.Max(p => p.DailyEmissionValue)).First().GeneratorType
+                                     }).OrderByDescending(s => s.DailyEmissionValue).ToList();
+        }
+
+        /// <summary>
+        /// Calculates the actual heat rate value.
+        /// </summary>
+        private void CalculateCummulativeActualHeatRate()
+        {
+            // Coal Emissions
+            foreach (var coalGeneration in GenerationReportData.Coal)
+            {
+                var coalHeatRate = coalGeneration.TotalHeatInput / coalGeneration.ActualNetGeneration;
+
+                var coalDailyEmission = new ActualHeatRate
+                {
+                    Name = coalGeneration.Name,
+                    HeatRate = coalHeatRate
+                };
+
+                ActualHeatRates.Add(coalDailyEmission);
+            }
         }
 
         #endregion
