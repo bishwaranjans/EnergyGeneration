@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace EnergyGeneration.Domain.Entities
+namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
 {
     /// <summary>
     /// GenerationReport
     /// </summary>
-    /// <seealso cref="EnergyGeneration.Domain.Entities.GenerationReportResult" />
+    /// <seealso cref="EnergyGeneration.Domain.Entities.GenerationReportEntities.GenerationReportResult" />
     public class GenerationReport : GenerationReportResult
     {
         /// <summary>

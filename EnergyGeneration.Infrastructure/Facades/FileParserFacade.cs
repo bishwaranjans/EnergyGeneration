@@ -26,12 +26,14 @@ namespace EnergyGeneration.Infrastructure.Facades
         /// Parses the file.
         /// </summary>
         /// <param name="FileName">Name of the file.</param>
-        public void ParseFile(string FileName)
+        /// <param name="isReferenceData">if set to <c>true</c> [is reference data].</param>
+        public void ParseFile(string FileName, bool isReferenceData = false)
         {
             ValidateFile.Validate(FileName);
             ParserType type = GetExtention(FileName);
             parser = Factory.GetObject(type.ToString());
             parser.FileName = FileName;
+            parser.IsReferenceData = isReferenceData;
             parser.Read();
         }
 

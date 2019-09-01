@@ -1,4 +1,4 @@
-﻿using EnergyGeneration.Domain.Entities;
+﻿using EnergyGeneration.Domain.Entities.GenerationReportEntities;
 using System.Collections.Generic;
 
 namespace EnergyGeneration.Domain.Base
@@ -37,11 +37,6 @@ namespace EnergyGeneration.Domain.Base
         /// Read the file rows and process it for Xml, CSV,PIPE and other delimiters in case of further support
         /// </summary>
         public abstract void Read();
-        
-        /// <summary>
-        /// Generates the output.
-        /// </summary>
-        public abstract void GenerateOutput();
 
         /// <summary>
         /// Gets or sets the name of the file.
@@ -50,6 +45,14 @@ namespace EnergyGeneration.Domain.Base
         /// The name of the file.
         /// </value>
         public string FileName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is reference data.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is reference data; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsReferenceData { get; set; }
 
         /// <summary>
         /// Gets or sets the results.

@@ -1,13 +1,9 @@
 ﻿using EnergyGeneration.Domain.SeedWork;
 using EnergyGeneration.Infrastructure.Facades;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace EnergyGeneration.Console
 {
@@ -61,6 +57,12 @@ namespace EnergyGeneration.Console
 
             // Instantiate the facade
             facade = new FileParserFacade();
+
+            // Initialize the reference data
+            System.Console.ForegroundColor = ConsoleColor.Green;
+            System.Console.WriteLine($"Reference File: {Constants.ReferenceDataFileFullName} processing started @ {DateTime.Now}.");
+            facade.ParseFile(Constants.ReferenceDataFileFullName, true);
+            System.Console.WriteLine($"Reference File: {Constants.ReferenceDataFileFullName} finished processing @ {DateTime.Now}.");
         }
 
         /// <summary>
@@ -131,7 +133,6 @@ namespace EnergyGeneration.Console
             sw.Start();
 
             // Begin reading
-            facade = new FileParserFacade();
             facade.ParseFile(fullFileName);
 
             // Begin Report generation

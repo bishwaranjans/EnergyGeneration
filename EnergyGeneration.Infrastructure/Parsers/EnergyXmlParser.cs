@@ -1,5 +1,6 @@
 ﻿using EnergyGeneration.Domain.Base;
-using EnergyGeneration.Domain.Entities;
+using EnergyGeneration.Domain.Entities.GenerationReportEntities;
+using EnergyGeneration.Domain.Entities.ReferenceDataEntities;
 using EnergyGeneration.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,12 @@ namespace EnergyGeneration.Infrastructure.Parsers
     /// <seealso cref="EnergyGeneration.Domain.Base.BaseParser" />
     public class EnergyXmlParser : BaseParser
     {
+        private ReferenceData ReferenceData;
+        private GenerationReport GenerationReportData;
+        private List<DailyGeneration> DailyGenerations = new List<DailyGeneration>();
+        private List<DailyEmission> DailyEmissions = new List<DailyEmission>();
+        private List<ActualHeatRate> ActualHeatRates = new List<ActualHeatRate>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EnergyXmlParser"/> class.
         /// </summary>
@@ -38,30 +45,290 @@ namespace EnergyGeneration.Infrastructure.Parsers
         {
             try
             {
-                var generationReport = new GenerationReport()
+                // Populate the factor reference data during initialization of application.
+                // ONce aplication starts, reference data can not be modified
+                if (IsReferenceData)
                 {
-                    Wind = GetWindGenerators(),
-                    Coal = GetCoalGenerator(),
-                    Gas = GetGasGenerators()
-                };
-
-                System.Console.WriteLine($"Generation report parsed!{Environment.NewLine}Wind Generator count: {generationReport.Wind.Count}{Environment.NewLine}Coal Generator count: {generationReport.Coal.Count}{Environment.NewLine}Gas Generator count: {generationReport.Gas.Count}{Environment.NewLine}");
+                    ParseReferenceData();
+                }
+                else
+                {
+                    ParseGenerateReportData();
+                    CalculateDailyGenerationValue();
+                    CalculateDailyEmissionValue();
+                    CalculateActualHeatRateValue();
+                }
             }
             catch (Exception ex)
             {
                 System.Console.ForegroundColor = ConsoleColor.Red;
-                System.Console.WriteLine($"Error occurre! Message : {ex.Message}. StackTrace : {ex.StackTrace}");
+                System.Console.WriteLine($"Error occurred! Message : {ex.Message}. StackTrace : {ex.StackTrace}");
                 System.Console.ForegroundColor = ConsoleColor.Green;
             }
         }
 
-        /// <summary>
-        /// Generates the output.
-        /// </summary>
-        /// <exception cref="System.NotImplementedException"></exception>
-        public override void GenerateOutput()
+        public void CalculateDailyGenerationValue()
         {
-            throw new NotImplementedException();
+            // Dailywise wind generation
+            foreach (var windGeneration in GenerationReportData.Wind)
+            {
+                foreach (var dayWiseWindGeneration in windGeneration.Generation)
+                {
+                    var windGenerationDay = dayWiseWindGeneration.Date;
+                    double valueFactorMappingReferenceData = 1;
+
+                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(windGeneration.GeneratorType))
+                    {
+                        var valueFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[windGeneration.GeneratorType];
+                        var valueFactorMapping = valueFactorMappingTuple.Item1.Value;
+
+                        switch (valueFactorMapping)
+                        {
+                            case ValueFactorType.Low:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Low;
+                                break;
+                            case ValueFactorType.Medium:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Medium;
+                                break;
+                            case ValueFactorType.High:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.High;
+                                break;
+                        };
+
+                    }
+                    var windGenerationByDay = dayWiseWindGeneration.Energy * dayWiseWindGeneration.Price * valueFactorMappingReferenceData;
+
+                    var windDailyGeneration = new DailyGeneration
+                    {
+                        Date = windGenerationDay,
+                        GenerationTypeName = windGeneration.Name,
+                        GeneratorType = windGeneration.GeneratorType,
+                        GenerationValue = windGenerationByDay
+                    };
+
+                    DailyGenerations.Add(windDailyGeneration);
+                }
+            }
+
+            // Gas generation
+            foreach (var gasGeneration in GenerationReportData.Gas)
+            {
+                foreach (var dayWiseGasGeneration in gasGeneration.Generation)
+                {
+                    var gasGenerationDay = dayWiseGasGeneration.Date;
+                    double valueFactorMappingReferenceData = 1;
+
+                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(gasGeneration.GeneratorType))
+                    {
+                        var valueFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[gasGeneration.GeneratorType];
+                        var valueFactorMapping = valueFactorMappingTuple.Item1.Value;
+
+                        switch (valueFactorMapping)
+                        {
+                            case ValueFactorType.Low:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Low;
+                                break;
+                            case ValueFactorType.Medium:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Medium;
+                                break;
+                            case ValueFactorType.High:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.High;
+                                break;
+                        };
+
+                    }
+                    var gasGenerationByDay = dayWiseGasGeneration.Energy * dayWiseGasGeneration.Price * valueFactorMappingReferenceData;
+
+                    var gasDailyGeneration = new DailyGeneration
+                    {
+                        Date = gasGenerationDay,
+                        GenerationTypeName = gasGeneration.Name,
+                        GeneratorType = GeneratorType.Gas,
+                        GenerationValue = gasGenerationByDay
+                    };
+
+                    DailyGenerations.Add(gasDailyGeneration);
+                }
+            }
+
+            // Coal generation
+            foreach (var coalGeneration in GenerationReportData.Coal)
+            {
+                foreach (var dayWiseCoalGeneration in coalGeneration.Generation)
+                {
+                    var coalGenerationDay = dayWiseCoalGeneration.Date;
+                    double valueFactorMappingReferenceData = 1;
+
+                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(coalGeneration.GeneratorType))
+                    {
+                        var valueFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[coalGeneration.GeneratorType];
+                        var valueFactorMapping = valueFactorMappingTuple.Item1.Value;
+
+                        switch (valueFactorMapping)
+                        {
+                            case ValueFactorType.Low:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Low;
+                                break;
+                            case ValueFactorType.Medium:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.Medium;
+                                break;
+                            case ValueFactorType.High:
+                                valueFactorMappingReferenceData = ReferenceData.ValueFactor.High;
+                                break;
+                        };
+
+                    }
+                    var coalGenerationByDay = dayWiseCoalGeneration.Energy * dayWiseCoalGeneration.Price * valueFactorMappingReferenceData;
+
+                    var coalDailyGeneration = new DailyGeneration
+                    {
+                        Date = coalGenerationDay,
+                        GenerationTypeName = coalGeneration.Name,
+                        GeneratorType = GeneratorType.Coal,
+                        GenerationValue = coalGenerationByDay
+                    };
+
+                    DailyGenerations.Add(coalDailyGeneration);
+                }
+            }
+
+            // Total offshore wind type generation
+            var TotalOnshoreWindGeneration = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.OnshoreWind).GroupBy(s => s.GenerationTypeName)
+                .Select(s => new Dictionary<string, double> {
+                    { s.Key,s.Select(p=>p.GenerationValue).Sum() }
+                }).FirstOrDefault();
+
+            // Total onshore wind type generation
+            var TotalOffshoreWindGeneration = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.OffshoreWind).GroupBy(s => s.GenerationTypeName)
+                .Select(s => new Dictionary<string, double> {
+                    { s.Key,s.Select(p=>p.GenerationValue).Sum() }
+                }).FirstOrDefault();
+
+            // Total Gas Generation By Name
+            Dictionary<string, double> TotalGasGenerationByName = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.Gas).GroupBy(s => s.GenerationTypeName)
+                .Select(s => new Dictionary<string, double> {
+                    { s.Key,s.Select(p=>p.GenerationValue).Sum() }
+                }).FirstOrDefault();
+
+            // Total Coal Generation By Name
+            Dictionary<string, double> TotalCoalGenerationByName = DailyGenerations.Where(s => s.GeneratorType == GeneratorType.Coal).GroupBy(s => s.GenerationTypeName)
+                .Select(s => new Dictionary<string, double> {
+                    { s.Key,s.Select(p=>p.GenerationValue).Sum() }
+                }).FirstOrDefault();
+        }
+
+        public void CalculateDailyEmissionValue()
+        {
+            // Dailywise wind emission
+            // Wind is not emitting anything
+            // No Emissions factor and value is provided in contract xml format 
+
+            // Gas Emissions
+            foreach (var gasGeneration in GenerationReportData.Gas)
+            {
+                foreach (var dayWiseGasGeneration in gasGeneration.Generation)
+                {
+                    var gasGenerationDay = dayWiseGasGeneration.Date;
+                    double emissionFactorMappingReferenceData = 1;
+
+                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(gasGeneration.GeneratorType))
+                    {
+                        var emissionFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[gasGeneration.GeneratorType];
+                        var emissionFactorMapping = emissionFactorMappingTuple.Item2.Value;
+
+                        switch (emissionFactorMapping)
+                        {
+                            case EmissionFactorType.NA:
+                                emissionFactorMappingReferenceData = 0;
+                                break;
+                            case EmissionFactorType.Low:
+                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.Low;
+                                break;
+                            case EmissionFactorType.Medium:
+                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.Medium;
+                                break;
+                            case EmissionFactorType.High:
+                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.High;
+                                break;
+                        };
+
+                    }
+                    var gasEmissionByDay = dayWiseGasGeneration.Energy * gasGeneration.EmissionsRating * emissionFactorMappingReferenceData;
+
+                    var gasDailyEmission = new DailyEmission
+                    {
+                        Date = gasGenerationDay,
+                        GenerationTypeName = gasGeneration.Name,
+                        GeneratorType = GeneratorType.Gas,
+                        DailyEmissionValue = gasEmissionByDay
+                    };
+
+                    DailyEmissions.Add(gasDailyEmission);
+                }
+            }
+
+            // Coal Emissions
+            foreach (var coalGeneration in GenerationReportData.Coal)
+            {
+                foreach (var dayWiseCoalGeneration in coalGeneration.Generation)
+                {
+                    var coalGenerationDay = dayWiseCoalGeneration.Date;
+                    double emissionFactorMappingReferenceData = 1;
+
+                    if (Constants.GeneratorsTypeToFactorMapper.ContainsKey(coalGeneration.GeneratorType))
+                    {
+                        var emissionFactorMappingTuple = Constants.GeneratorsTypeToFactorMapper[coalGeneration.GeneratorType];
+                        var emissionFactorMapping = emissionFactorMappingTuple.Item2.Value;
+
+                        switch (emissionFactorMapping)
+                        {
+                            case EmissionFactorType.NA:
+                                emissionFactorMappingReferenceData = 0;
+                                break;
+                            case EmissionFactorType.Low:
+                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.Low;
+                                break;
+                            case EmissionFactorType.Medium:
+                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.Medium;
+                                break;
+                            case EmissionFactorType.High:
+                                emissionFactorMappingReferenceData = ReferenceData.EmissionFactor.High;
+                                break;
+                        };
+
+                    }
+                    var coalEmissionByDay = dayWiseCoalGeneration.Energy * coalGeneration.EmissionsRating * emissionFactorMappingReferenceData;
+
+                    var coalDailyEmission = new DailyEmission
+                    {
+                        Date = coalGenerationDay,
+                        GenerationTypeName = coalGeneration.Name,
+                        GeneratorType = GeneratorType.Coal,
+                        DailyEmissionValue = coalEmissionByDay
+                    };
+
+                    DailyEmissions.Add(coalDailyEmission);
+                }
+            }
+
+            var MaxEmissionGenerators = DailyEmissions.OrderByDescending(s => s.DailyEmissionValue).Take(DailyEmissions.Count >= MaximumEmissionOutputGeneratorTypeDisplayCount ? MaximumEmissionOutputGeneratorTypeDisplayCount : DailyEmissions.Count).ToList();
+        }
+
+        public void CalculateActualHeatRateValue()
+        {
+            // Coal Emissions
+            foreach (var coalGeneration in GenerationReportData.Coal)
+            {
+                var coalHeatRate = coalGeneration.TotalHeatInput / coalGeneration.ActualNetGeneration;
+
+                var coalDailyEmission = new ActualHeatRate
+                {
+                    Name= coalGeneration.Name,                  
+                    HeatRate = coalHeatRate
+                };
+
+                ActualHeatRates.Add(coalDailyEmission);
+            }
         }
 
         /// <summary>
@@ -107,6 +374,67 @@ namespace EnergyGeneration.Infrastructure.Parsers
         }
 
         /// <summary>
+        /// Parses the reference data.
+        /// </summary>
+        private void ParseReferenceData()
+        {
+            ReferenceData = new ReferenceData()
+            {
+                ValueFactor = GetValueFactors(),
+                EmissionFactor = GetEmissionsFactors()
+            };
+        }
+
+        /// <summary>
+        /// Parses the generate report data.
+        /// </summary>
+        private void ParseGenerateReportData()
+        {
+            GenerationReportData = new GenerationReport()
+            {
+                Wind = GetWindGenerators(),
+                Coal = GetCoalGenerator(),
+                Gas = GetGasGenerators()
+            };
+
+            System.Console.WriteLine($"Generation report parsed!{Environment.NewLine}Wind Generator count: {GenerationReportData.Wind.Count}{Environment.NewLine}Coal Generator count: {GenerationReportData.Coal.Count}{Environment.NewLine}Gas Generator count: {GenerationReportData.Gas.Count}{Environment.NewLine}");
+        }
+
+        /// <summary>
+        /// Gets the value factors.
+        /// </summary>
+        /// <returns></returns>
+        private BaseFactor GetValueFactors()
+        {
+            var valueFactor = (from factor in SimpleStreamAxis(FileName, "ValueFactor")
+                               select new BaseFactor
+                               {
+                                   High = double.Parse(factor.ElementAnyNS("High").Value),
+                                   Medium = double.Parse(factor.ElementAnyNS("Medium").Value),
+                                   Low = double.Parse(factor.ElementAnyNS("Low").Value),
+                               }).FirstOrDefault();
+
+            return valueFactor;
+        }
+
+        /// <summary>
+        /// Gets the Emissions factors.
+        /// </summary>
+        /// <returns></returns>
+        private BaseFactor GetEmissionsFactors()
+        {
+            var emissionsFactor = (from factor in SimpleStreamAxis(FileName, "EmissionsFactor")
+                                   select new BaseFactor
+                                   {
+                                       High = double.Parse(factor.ElementAnyNS("High").Value),
+                                       Medium = double.Parse(factor.ElementAnyNS("Medium").Value),
+                                       Low = double.Parse(factor.ElementAnyNS("Low").Value),
+                                   }).FirstOrDefault();
+
+            return emissionsFactor;
+        }
+
+        /// <summary>
         /// Gets the wind generators.
         /// </summary>
         /// <returns></returns>
@@ -118,6 +446,7 @@ namespace EnergyGeneration.Infrastructure.Parsers
                                       IsFossilFuel = false,
                                       Name = (windGeneratorElement.ElementAnyNS("Name") != null) ? windGeneratorElement.ElementAnyNS("Name").Value : string.Empty,
                                       Location = (windGeneratorElement.ElementAnyNS("Location") != null) ? windGeneratorElement.ElementAnyNS("Location").Value : string.Empty,
+                                      GeneratorType = (windGeneratorElement.ElementAnyNS("Location") != null) ? (windGeneratorElement.ElementAnyNS("Location").Value.Contains("Offshore", StringComparison.OrdinalIgnoreCase) ? GeneratorType.OffshoreWind : GeneratorType.OnshoreWind) : GeneratorType.OnshoreWind,
                                       Generation = windGeneratorElement.ElementAnyNS("Generation") != null ? (from dayGeneration in windGeneratorElement.ElementAnyNS("Generation").Elements()
                                                                                                               select new Day
                                                                                                               {
@@ -139,6 +468,7 @@ namespace EnergyGeneration.Infrastructure.Parsers
             var gasGenerators = (from gasGeneratorElement in SimpleStreamAxis(FileName, "GasGenerator")
                                  select new GasGenerator
                                  {
+                                     GeneratorType = GeneratorType.Gas,
                                      IsFossilFuel = true,
                                      Name = (gasGeneratorElement.ElementAnyNS("Name") != null) ? gasGeneratorElement.ElementAnyNS("Name").Value : string.Empty,
                                      EmissionsRating = (gasGeneratorElement.ElementAnyNS("EmissionsRating") != null) ? Double.Parse(gasGeneratorElement.ElementAnyNS("EmissionsRating").Value) : 0.0,
@@ -163,6 +493,7 @@ namespace EnergyGeneration.Infrastructure.Parsers
             var gasGenerators = (from coalGeneratorElement in SimpleStreamAxis(FileName, "CoalGenerator")
                                  select new CoalGenerator
                                  {
+                                     GeneratorType = GeneratorType.Coal,
                                      IsFossilFuel = true,
                                      Name = (coalGeneratorElement.ElementAnyNS("Name") != null) ? coalGeneratorElement.ElementAnyNS("Name").Value : string.Empty,
                                      EmissionsRating = (coalGeneratorElement.ElementAnyNS("EmissionsRating") != null) ? Double.Parse(coalGeneratorElement.ElementAnyNS("EmissionsRating").Value) : 0.0,

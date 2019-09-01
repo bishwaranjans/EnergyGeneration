@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EnergyGeneration.Domain.Entities
+namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
 {
     /// <summary>
     /// GenerationReportResult

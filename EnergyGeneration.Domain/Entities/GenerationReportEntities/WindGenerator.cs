@@ -1,9 +1,9 @@
-﻿namespace EnergyGeneration.Domain.Entities
+﻿namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
 {
     /// <summary>
     /// WindGenerator
     /// </summary>
-    /// <seealso cref="EnergyGeneration.Domain.Entities.BaseGenerator" />
+    /// <seealso cref="BaseGenerator" />
     public class WindGenerator : BaseGenerator
     {
         /// <summary>

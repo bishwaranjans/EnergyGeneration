@@ -1,9 +1,9 @@
-﻿namespace EnergyGeneration.Domain.Entities
+﻿namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
 {
     /// <summary>
     /// CoalGenerator
     /// </summary>
-    /// <seealso cref="EnergyGeneration.Domain.Entities.GasGenerator" />
+    /// <seealso cref="EnergyGeneration.Domain.Entities.GenerationReportEntities.GasGenerator" />
     public class CoalGenerator : GasGenerator
     {
         /// <summary>

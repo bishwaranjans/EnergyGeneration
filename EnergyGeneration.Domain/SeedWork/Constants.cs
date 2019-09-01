@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace EnergyGeneration.Domain.SeedWork
 {
@@ -24,6 +26,16 @@ namespace EnergyGeneration.Domain.SeedWork
         /// </summary>
         public static string FileNameToProcess = ConfigurationManager.AppSettings["FileNameToProcess"];
 
+        /// <summary>
+        /// The reference data file full name
+        /// </summary>
+        public static string ReferenceDataFileFullName = ConfigurationManager.AppSettings["ReferenceDataFileFullName"];
+
+        /// <summary>
+        /// The maximum emission output generator type display count
+        /// </summary>
+        public static int MaximumEmissionOutputGeneratorTypeDisplayCount = ConfigurationManager.AppSettings["MaximumEmissionOutputGeneratorTypeDisplayCount"] == null ? 3 : int.Parse(ConfigurationManager.AppSettings["MaximumEmissionOutputGeneratorTypeDisplayCount"]);
+
         #endregion
 
         #region Enums
@@ -36,6 +48,59 @@ namespace EnergyGeneration.Domain.SeedWork
             Xml,
             // e.g. CSV or more depending upon the supported format       
         }
+
+        /// <summary>
+        /// GeneratorType
+        /// </summary>
+        public enum GeneratorType
+        {
+            OffshoreWind,
+            OnshoreWind,
+            Coal,
+            Gas
+        }
+
+        /// <summary>
+        /// FactorType
+        /// </summary>
+        public enum FactorType
+        {
+            ValueFactor,
+            EmissionFactor
+        }
+
+        /// <summary>
+        /// ValueFactorType
+        /// </summary>
+        public enum ValueFactorType
+        {
+            Low,
+            Medium,
+            High
+        }
+
+        public enum EmissionFactorType
+        {
+            NA,
+            Low,
+            Medium,
+            High
+        }
+
+        #endregion
+
+        #region GeneratorsTypeToFactor Maping
+
+        /// <summary>
+        /// The generators type to factor mapper
+        /// </summary>
+        public static Dictionary<GeneratorType, Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>> GeneratorsTypeToFactorMapper = new Dictionary<GeneratorType, Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>>
+        {
+            { GeneratorType.OffshoreWind,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Low),new KeyValuePair<FactorType, EmissionFactorType>(FactorType.EmissionFactor,EmissionFactorType.NA))},
+            { GeneratorType.OnshoreWind,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.High),new KeyValuePair<FactorType, EmissionFactorType>(FactorType.EmissionFactor,EmissionFactorType.NA))},
+            { GeneratorType.Gas,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Medium),new KeyValuePair<FactorType, EmissionFactorType>(FactorType.EmissionFactor,EmissionFactorType.Medium))},
+            { GeneratorType.Coal,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Medium),new KeyValuePair<FactorType, EmissionFactorType>(FactorType.EmissionFactor,EmissionFactorType.High))},
+         };
 
         #endregion
     }
