@@ -19,6 +19,6 @@
         /// <value>
         /// The emission factor.
         /// </value>
-        public BaseFactor EmissionFactor { get; set; }
+        public BaseFactor EmissionsFactor { get; set; }
     }
 }

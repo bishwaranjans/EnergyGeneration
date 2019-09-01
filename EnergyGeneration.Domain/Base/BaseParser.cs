@@ -39,6 +39,11 @@ namespace EnergyGeneration.Domain.Base
         public abstract void Read();
 
         /// <summary>
+        /// Processes the data.
+        /// </summary>
+        public abstract void ProcessData();
+
+        /// <summary>
         /// Generations the output.
         /// </summary>
         public abstract void GenerationOutput();

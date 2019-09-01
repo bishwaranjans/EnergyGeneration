@@ -58,16 +58,16 @@ namespace EnergyGeneration.Domain.SeedWork
 
                 switch (emissionFactorMapping)
                 {
-                    case EmissionFactorType.NA:
+                    case EmissionsFactorType.NA:
                         emissionFactorMappingReferenceData = 0;
                         break;
-                    case EmissionFactorType.Low:
+                    case EmissionsFactorType.Low:
                         emissionFactorMappingReferenceData = emissionFactor.Low;
                         break;
-                    case EmissionFactorType.Medium:
+                    case EmissionsFactorType.Medium:
                         emissionFactorMappingReferenceData = emissionFactor.Medium;
                         break;
-                    case EmissionFactorType.High:
+                    case EmissionsFactorType.High:
                         emissionFactorMappingReferenceData = emissionFactor.High;
                         break;
                 };

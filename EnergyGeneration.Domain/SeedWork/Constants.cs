@@ -66,7 +66,7 @@ namespace EnergyGeneration.Domain.SeedWork
         public enum FactorType
         {
             ValueFactor,
-            EmissionFactor
+            EmissionsFactor
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace EnergyGeneration.Domain.SeedWork
             High
         }
 
-        public enum EmissionFactorType
+        public enum EmissionsFactorType
         {
             NA,
             Low,
@@ -94,17 +94,17 @@ namespace EnergyGeneration.Domain.SeedWork
         /// <summary>
         /// The generators type to factor mapper
         /// </summary>
-        public static Dictionary<GeneratorType, Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>> GeneratorsTypeToFactorMapper = new Dictionary<GeneratorType, Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>>
+        public static Dictionary<GeneratorType, Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionsFactorType>>> GeneratorsTypeToFactorMapper = new Dictionary<GeneratorType, Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionsFactorType>>>
         {
-            { GeneratorType.OffshoreWind,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Low),new KeyValuePair<FactorType, EmissionFactorType>(FactorType.EmissionFactor,EmissionFactorType.NA))},
-            { GeneratorType.OnshoreWind,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.High),new KeyValuePair<FactorType, EmissionFactorType>(FactorType.EmissionFactor,EmissionFactorType.NA))},
-            { GeneratorType.Gas,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Medium),new KeyValuePair<FactorType, EmissionFactorType>(FactorType.EmissionFactor,EmissionFactorType.Medium))},
-            { GeneratorType.Coal,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Medium),new KeyValuePair<FactorType, EmissionFactorType>(FactorType.EmissionFactor,EmissionFactorType.High))},
+            { GeneratorType.OffshoreWind,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionsFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Low),new KeyValuePair<FactorType, EmissionsFactorType>(FactorType.EmissionsFactor,EmissionsFactorType.NA))},
+            { GeneratorType.OnshoreWind,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionsFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.High),new KeyValuePair<FactorType, EmissionsFactorType>(FactorType.EmissionsFactor,EmissionsFactorType.NA))},
+            { GeneratorType.Gas,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionsFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Medium),new KeyValuePair<FactorType, EmissionsFactorType>(FactorType.EmissionsFactor,EmissionsFactorType.Medium))},
+            { GeneratorType.Coal,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionsFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Medium),new KeyValuePair<FactorType, EmissionsFactorType>(FactorType.EmissionsFactor,EmissionsFactorType.High))},
          };
 
         #endregion
 
-        #region Output File Format
+        #region Xml Nodes
 
         public const string GenerationOutput = "GenerationOutput";
         public const string Totals = "Totals";
@@ -117,6 +117,19 @@ namespace EnergyGeneration.Domain.SeedWork
         public const string Emission = "Emission";
         public const string ActualHeatRates = "ActualHeatRates";
         public const string HeatRate = "HeatRate";
+
+        public const string WindGenerator = "WindGenerator";
+        public const string Location = "Location";
+        public const string Offshore = "Offshore";
+        public const string Generation = "Generation";
+        public const string Energy = "Energy";
+        public const string Price = "Price";
+
+        public const string GasGenerator = "GasGenerator";
+        public const string CoalGenerator = "CoalGenerator";
+        public const string EmissionsRating = "EmissionsRating";
+        public const string ActualNetGeneration = "ActualNetGeneration";
+        public const string TotalHeatInput = "TotalHeatInput";
 
         #endregion
     }

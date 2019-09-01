@@ -35,7 +35,16 @@ namespace EnergyGeneration.Infrastructure.Facades
             parser.FileName = FileName;
             parser.IsReferenceData = isReferenceData;
             parser.Read();
+
+            // Process and generate output if not a refernce file
+            // Reference.xml does not need to be processe and generate output as it will be used only for reference
+            if (!isReferenceData)
+            {
+                parser.ProcessData();
+                parser.GenerationOutput();
+            }
         }
+
 
         /// <summary>
         /// Gets the extention.

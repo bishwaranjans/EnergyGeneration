@@ -1,5 +1,6 @@
 ﻿using EnergyGeneration.Domain.SeedWork;
 using EnergyGeneration.Infrastructure.Facades;
+using log4net;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +13,8 @@ namespace EnergyGeneration.Console
     /// </summary>
     class Bootstraper
     {
+        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static readonly Lazy<Bootstraper> lazy = new Lazy<Bootstraper>(() => new Bootstraper());
         private static FileSystemWatcher fileWatcher;
         private static FileParserFacade facade;
@@ -59,10 +62,9 @@ namespace EnergyGeneration.Console
             facade = new FileParserFacade();
 
             // Initialize the reference data
-            System.Console.ForegroundColor = ConsoleColor.Green;
-            System.Console.WriteLine($"Reference File: {Constants.ReferenceDataFileFullName} processing started @ {DateTime.Now}.");
+            Logger.Info($"Reference File: {Constants.ReferenceDataFileFullName} processing started.");
             facade.ParseFile(Constants.ReferenceDataFileFullName, true);
-            System.Console.WriteLine($"Reference File: {Constants.ReferenceDataFileFullName} finished processing @ {DateTime.Now}.");
+            Logger.Info($"Reference File: {Constants.ReferenceDataFileFullName} finished processing.");
         }
 
         /// <summary>
@@ -79,11 +81,9 @@ namespace EnergyGeneration.Console
 
                 /* do my stuff once asynchronously */
                 // Specify what is done when a file is changed, created, or deleted.
-                System.Console.ForegroundColor = ConsoleColor.White;
-                System.Console.WriteLine($"{Environment.NewLine}File: {e.FullPath} {e.ChangeType} @ {DateTime.Now}");
 
-                System.Console.ForegroundColor = ConsoleColor.Yellow;
-                System.Console.WriteLine($"File: {Constants.FileNameToProcess} changes are in progress.{Environment.NewLine}Waiting to finish the cahnges and meanwhile listener has been disabled. Any new addition/modification of the file will not process.");
+                Logger.Info($"{Environment.NewLine}File: {e.FullPath} {e.ChangeType}");
+                Logger.Warn($"File: {Constants.FileNameToProcess} changes are in progress.{Environment.NewLine}Waiting to finish the changes and meanwhile listener has been disabled. Any new addition/modification of the file will not process.");
 
                 // Wait for the whole file to get copied to watch folder
                 WaitForFile(e.FullPath);
@@ -126,8 +126,7 @@ namespace EnergyGeneration.Console
         /// <param name="fullFileName">Full name of the file.</param>
         private static void BeginReading(string fullFileName)
         {
-            System.Console.ForegroundColor = ConsoleColor.Green;
-            System.Console.WriteLine($"File: {Constants.FileNameToProcess} is available now and processing started @ {DateTime.Now}.");
+            Logger.Info($"File: {Constants.FileNameToProcess} is available now and processing started.");
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -138,7 +137,7 @@ namespace EnergyGeneration.Console
             // Begin Report generation
 
             sw.Stop();
-            System.Console.WriteLine($"File: {Constants.FileNameToProcess} finished processing @ {DateTime.Now}. Total elapsed time in seconds : {sw.Elapsed.TotalSeconds}");
+            Logger.Info($"File: {Constants.FileNameToProcess} finished processing. Total elapsed time in seconds : {sw.Elapsed.TotalSeconds}.{Environment.NewLine}The generated output file: {Constants.OutputFileName} can be found @ {Constants.OutputFileFolder}.");
         }
     }
 }

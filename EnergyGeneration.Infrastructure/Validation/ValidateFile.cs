@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.IO;
 
 namespace EnergyGeneration.Infrastructure.Validation
@@ -8,6 +9,8 @@ namespace EnergyGeneration.Infrastructure.Validation
     /// </summary>
     public class ValidateFile
     {
+        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// Validates the specified file name.
         /// </summary>
@@ -17,6 +20,7 @@ namespace EnergyGeneration.Infrastructure.Validation
         {
             if (!File.Exists(fileName))
             {
+                Logger.Error($"File: {fileName} not found!");
                 throw new Exception($"File: {fileName} not found!");
             }
         }
