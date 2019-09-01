@@ -39,6 +39,11 @@ namespace EnergyGeneration.Domain.Base
         public abstract void Read();
 
         /// <summary>
+        /// Generations the output.
+        /// </summary>
+        public abstract void GenerationOutput();
+
+        /// <summary>
         /// Gets or sets the name of the file.
         /// </summary>
         /// <value>

@@ -17,24 +17,24 @@ namespace EnergyGeneration.Domain.SeedWork
         public static string FolderToWatch = ConfigurationManager.AppSettings["FolderToWatch"];
 
         /// <summary>
-        /// The output file folder
-        /// </summary>
-        public static string OutputFileFolder = ConfigurationManager.AppSettings["OutputFileFolder"];
-
-        /// <summary>
         /// The file name to process
         /// </summary>
         public static string FileNameToProcess = ConfigurationManager.AppSettings["FileNameToProcess"];
 
         /// <summary>
+        /// The output file folder
+        /// </summary>
+        public static string OutputFileFolder = ConfigurationManager.AppSettings["OutputFileFolder"];
+
+        /// <summary>
+        /// The output file name
+        /// </summary>
+        public static string OutputFileName = ConfigurationManager.AppSettings["OutputFileName"];
+
+        /// <summary>
         /// The reference data file full name
         /// </summary>
         public static string ReferenceDataFileFullName = ConfigurationManager.AppSettings["ReferenceDataFileFullName"];
-
-        /// <summary>
-        /// The maximum emission output generator type display count
-        /// </summary>
-        public static int MaximumEmissionOutputGeneratorTypeDisplayCount = ConfigurationManager.AppSettings["MaximumEmissionOutputGeneratorTypeDisplayCount"] == null ? 3 : int.Parse(ConfigurationManager.AppSettings["MaximumEmissionOutputGeneratorTypeDisplayCount"]);
 
         #endregion
 
