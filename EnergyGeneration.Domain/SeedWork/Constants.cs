@@ -103,5 +103,21 @@ namespace EnergyGeneration.Domain.SeedWork
          };
 
         #endregion
+
+        #region Output File Format
+
+        public const string GenerationOutput = "GenerationOutput";
+        public const string Totals = "Totals";
+        public const string Generator = "Generator";
+        public const string Name = "Name";
+        public const string Total = "Total";
+        public const string MaxEmissionGenerators = "MaxEmissionGenerators";
+        public const string Day = "Day";
+        public const string Date = "Date";
+        public const string Emission = "Emission";
+        public const string ActualHeatRates = "ActualHeatRates";
+        public const string HeatRate = "HeatRate";
+
+        #endregion
     }
 }

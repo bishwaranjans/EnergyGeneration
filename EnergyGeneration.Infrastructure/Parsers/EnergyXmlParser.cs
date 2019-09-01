@@ -85,20 +85,20 @@ namespace EnergyGeneration.Infrastructure.Parsers
         {
             XDocument doc = new XDocument(
                                 new XComment("This is energy generation output file."),
-                                new XElement("GenerationOutput",
-                                                   new XElement("Totals", from generation in TotalDailyGenerationByName
-                                                                          select new XElement("Generator",
-                                                                                     new XElement("Name", generation.Key),
-                                                                                     new XElement("Total", generation.Value))),
-                                                   new XElement("MaxEmissionGenerators", from generation in MaxEmissionGenerators
-                                                                                         select new XElement("Day",
-                                                                                                    new XElement("Name", generation.GenerationTypeName),
-                                                                                                    new XElement("Date", generation.Date),
-                                                                                                    new XElement("Emission", generation.DailyEmissionValue))),
+                                new XElement(Constants.GenerationOutput,
+                                                   new XElement(Constants.Totals, from generation in TotalDailyGenerationByName
+                                                                                  select new XElement(Constants.Generator,
+                                                                                             new XElement(Constants.Name, generation.Key),
+                                                                                             new XElement(Constants.Total, generation.Value))),
+                                                   new XElement(Constants.MaxEmissionGenerators, from generation in MaxEmissionGenerators
+                                                                                                 select new XElement(Constants.Day,
+                                                                                                            new XElement(Constants.Name, generation.GenerationTypeName),
+                                                                                                            new XElement(Constants.Date, generation.Date),
+                                                                                                            new XElement(Constants.Emission, generation.DailyEmissionValue))),
                                                   from actualHeatRate in ActualHeatRates
-                                                  select new XElement("ActualHeatRates",
-                                                             new XElement("Name", actualHeatRate.Name),
-                                                             new XElement("HeatRate", actualHeatRate.HeatRate))
+                                                  select new XElement(Constants.ActualHeatRates,
+                                                             new XElement(Constants.Name, actualHeatRate.Name),
+                                                             new XElement(Constants.HeatRate, actualHeatRate.HeatRate))
                                             )
                                 );
 
