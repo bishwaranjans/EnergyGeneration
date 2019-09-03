@@ -20,6 +20,7 @@ DDD approch has been used for designing the architecture of the solution by clea
  
  ![alt text](https://github.com/bishwaranjans/EnergyGeneration/blob/master/Documentation/EnergyGenerationReport.PNG)
  
+  ![alt text](https://github.com/bishwaranjans/EnergyGeneration/blob/master/Documentation/EntitiesRelationshipDiagram.PNG)
  ## Design Patterns
  
 Facade and Factory design patterns has been incorporated to design the application. The primary focus was to accommodate multiple parser into the application. Currently it is supporting XML parsing and later on it provides the extensibility to support any other parsing like CSV or EXcel etc. Basic SOLID design patterns has been followed wherever possible. 
