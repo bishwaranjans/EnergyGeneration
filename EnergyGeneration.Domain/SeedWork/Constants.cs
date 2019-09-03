@@ -102,6 +102,9 @@ namespace EnergyGeneration.Domain.SeedWork
             { GeneratorType.Coal,new Tuple<KeyValuePair<FactorType, ValueFactorType>, KeyValuePair<FactorType, EmissionsFactorType>>(new KeyValuePair<FactorType, ValueFactorType>(FactorType.ValueFactor,ValueFactorType.Medium),new KeyValuePair<FactorType, EmissionsFactorType>(FactorType.EmissionsFactor,EmissionsFactorType.High))},
          };
 
+        // This will be initialized during the application first time run
+        public static Entities.ReferenceDataEntities.ReferenceData ReferenceData;
+
         #endregion
 
         #region Xml Nodes

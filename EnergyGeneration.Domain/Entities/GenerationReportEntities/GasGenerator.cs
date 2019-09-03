@@ -3,15 +3,8 @@
     /// <summary>
     /// GasGenerator
     /// </summary>
-    /// <seealso cref="EnergyGeneration.Domain.Entities.GenerationReportEntities.BaseGenerator" />
-    public class GasGenerator : BaseGenerator
+    /// <seealso cref="EnergyGeneration.Domain.Entities.GenerationReportEntities.FossilFuelGenerator" />
+    public class GasGenerator : FossilFuelGenerator
     {
-        /// <summary>
-        /// Gets or sets the emissions rating.
-        /// </summary>
-        /// <value>
-        /// The emissions rating.
-        /// </value>
-        public double EmissionsRating { get; set; }
     }
 }

@@ -48,10 +48,8 @@
     <Compile Include="Entities\GenerationReportEntities\CoalGenerator.cs" />
     <Compile Include="Entities\GenerationReportEntities\DailyEmission.cs" />
     <Compile Include="Entities\GenerationReportEntities\Day.cs" />
-    <Compile Include="Entities\GenerationReportEntities\DailyGeneration.cs" />
     <Compile Include="Entities\GenerationReportEntities\GasGenerator.cs" />
-    <Compile Include="Entities\GenerationReportEntities\GenerationReport.cs" />
-    <Compile Include="Entities\GenerationReportEntities\GenerationReportResult.cs" />
+    <Compile Include="Entities\GenerationReportEntities\FossilFuelGenerator.cs" />
     <Compile Include="Entities\GenerationReportEntities\WindGenerator.cs" />
     <Compile Include="Entities\ReferenceDataEntities\BaseFactor.cs" />
     <Compile Include="Entities\ReferenceDataEntities\ReferenceData.cs" />

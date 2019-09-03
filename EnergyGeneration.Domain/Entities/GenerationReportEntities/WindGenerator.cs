@@ -6,6 +6,8 @@
     /// <seealso cref="BaseGenerator" />
     public class WindGenerator : BaseGenerator
     {
+        #region Properties
+
         /// <summary>
         /// Gets or sets the location.
         /// </summary>
@@ -13,5 +15,7 @@
         /// The location.
         /// </value>
         public string Location { get; set; }
+
+        #endregion
     }
 }

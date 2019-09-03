@@ -40,7 +40,6 @@ namespace EnergyGeneration.Infrastructure.Facades
             // Reference.xml does not need to be processe and generate output as it will be used only for reference
             if (!isReferenceData)
             {
-                parser.ProcessData();
                 parser.GenerationOutput();
             }
         }
