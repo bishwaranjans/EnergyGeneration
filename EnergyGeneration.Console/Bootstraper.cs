@@ -61,10 +61,8 @@ namespace EnergyGeneration.Console
             // Instantiate the facade
             facade = new FileParserFacade();
 
-            // Initialize the reference data
-            Logger.Info($"Reference File: {Constants.ReferenceDataFileFullName} processing started.");
+            // Initialize the reference data          
             facade.ParseFile(Constants.ReferenceDataFileFullName, true);
-            Logger.Info($"Reference File: {Constants.ReferenceDataFileFullName} finished processing.");
         }
 
         /// <summary>
@@ -126,18 +124,8 @@ namespace EnergyGeneration.Console
         /// <param name="fullFileName">Full name of the file.</param>
         private static void BeginReading(string fullFileName)
         {
-            Logger.Info($"File: {Constants.FileNameToProcess} is available now and processing started.");
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
             // Begin reading
             facade.ParseFile(fullFileName);
-
-            // Begin Report generation
-
-            sw.Stop();
-            Logger.Info($"File: {Constants.FileNameToProcess} finished processing. Total elapsed time in seconds : {sw.Elapsed.TotalSeconds}.{Environment.NewLine}The generated output file: {Constants.OutputFileName} can be found @ {Constants.OutputFileFolder}.");
         }
     }
 }

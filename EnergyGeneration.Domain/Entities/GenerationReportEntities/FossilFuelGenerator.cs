@@ -1,5 +1,6 @@
 ﻿using EnergyGeneration.Domain.SeedWork;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using static EnergyGeneration.Domain.SeedWork.Constants;
 
 namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
@@ -18,6 +19,8 @@ namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
         /// <value>
         /// The emissions rating.
         /// </value>
+        [Required(AllowEmptyStrings = false, ErrorMessage = "The EmissionsRating is Empty")]
+        [Range(0, double.MaxValue, ErrorMessage = "EmissionsRating is not a valid double datatype")]
         public double EmissionsRating { get; set; }
 
         /// <summary>

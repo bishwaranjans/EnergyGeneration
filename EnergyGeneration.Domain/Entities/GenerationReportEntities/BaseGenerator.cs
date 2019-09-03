@@ -1,5 +1,6 @@
 ﻿using EnergyGeneration.Domain.SeedWork;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using static EnergyGeneration.Domain.SeedWork.Constants;
 
 namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
@@ -17,6 +18,7 @@ namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
         /// <value>
         /// The name.
         /// </value>
+        [Required(AllowEmptyStrings = false, ErrorMessage = "The Generator Name is Empty")]
         public string Name { get; set; }
 
         /// <summary>
@@ -69,6 +71,14 @@ namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
                 return totalGeneratorGenerationByName;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the error messages.
+        /// </summary>
+        /// <value>
+        /// The error messages.
+        /// </value>
+        public List<string> ErrorMessages { get; set; }
 
         #endregion
     }

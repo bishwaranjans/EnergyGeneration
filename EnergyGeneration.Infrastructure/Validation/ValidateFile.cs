@@ -16,13 +16,14 @@ namespace EnergyGeneration.Infrastructure.Validation
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <exception cref="System.Exception">File: {fileName}</exception>
-        public static void Validate(string fileName)
+        public static bool Validate(string fileName)
         {
             if (!File.Exists(fileName))
             {
-                Logger.Error($"File: {fileName} not found!");
-                throw new Exception($"File: {fileName} not found!");
+                Logger.Error($"File: {fileName} not found! Report generation data will be inconsistent!");
+                return false;
             }
+            return true;
         }
     }
 }

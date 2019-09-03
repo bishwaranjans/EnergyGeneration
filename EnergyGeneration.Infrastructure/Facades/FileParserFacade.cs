@@ -29,18 +29,21 @@ namespace EnergyGeneration.Infrastructure.Facades
         /// <param name="isReferenceData">if set to <c>true</c> [is reference data].</param>
         public void ParseFile(string FileName, bool isReferenceData = false)
         {
-            ValidateFile.Validate(FileName);
-            ParserType type = GetExtention(FileName);
-            parser = Factory.GetObject(type.ToString());
-            parser.FileName = FileName;
-            parser.IsReferenceData = isReferenceData;
-            parser.Read();
-
-            // Process and generate output if not a refernce file
-            // Reference.xml does not need to be processe and generate output as it will be used only for reference
-            if (!isReferenceData)
+            // If basic validation passes
+            if (ValidateFile.Validate(FileName))
             {
-                parser.GenerationOutput();
+                ParserType type = GetExtention(FileName);
+                parser = Factory.GetObject(type.ToString());
+                parser.FileName = FileName;
+                parser.IsReferenceData = isReferenceData;
+                parser.Read();
+
+                // Process and generate output if not a refernce file
+                // Reference.xml does not need to be processe and generate output as it will be used only for reference
+                if (!isReferenceData)
+                {
+                    parser.GenerationOutput();
+                }
             }
         }
 

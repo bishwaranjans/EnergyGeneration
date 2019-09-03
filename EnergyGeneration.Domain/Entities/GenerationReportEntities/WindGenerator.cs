@@ -1,4 +1,6 @@
-﻿namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EnergyGeneration.Domain.Entities.GenerationReportEntities
 {
     /// <summary>
     /// WindGenerator
@@ -14,6 +16,7 @@
         /// <value>
         /// The location.
         /// </value>
+        [Required(AllowEmptyStrings = false, ErrorMessage = "The Location is Empty")]
         public string Location { get; set; }
 
         #endregion
