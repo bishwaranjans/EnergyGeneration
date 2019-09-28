@@ -16,7 +16,7 @@ DDD approch has been used for designing the architecture of the solution by clea
  - **EnergyGeneration.Console** : It is user interface of our solution signifying starting of the application and further processing and report generation. This is the entry block of our program.
  - **EnergyGeneration.Domain** : Responsible for representing concepts of the business, information about the business situation, and business rules. State that reflects the business situation is controlled and used here, even though the technical details of storing it are delegated to the infrastructure. This layer is the heart of our solution.
  - **EnergyGeneration.Infrastructure** : Responsible for how the data that is initially held in domain entities (in memory) or another persistent store. It contains all our parsing logic along wth validation.It also contains the logic for our energy calculation from the generator and the required output core logic.
- - **EnergyGeneration.UnitTests** : Responsible for mirroring the structure of the code under test. **ToDO**
+ - **EnergyGeneration.UnitTests** : Responsible for mirroring the structure of the code under test.
  
  ![alt text](https://github.com/bishwaranjans/EnergyGeneration/blob/master/Documentation/EnergyGenerationReport.PNG)
  
